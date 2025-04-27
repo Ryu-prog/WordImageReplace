@@ -1,0 +1,35 @@
+﻿<Window x:Class="WordImageReplace.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WordImageReplace"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="250" Width="400">
+    <Grid>
+        <StackPanel>
+            <TextBlock TextWrapping="Wrap" Text="①	修正対象Wordファイル（dotx）" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+            <TextBox x:Name="tbWordFilePath" TextWrapping="NoWrap" Text="" Width="240"/>
+            <Button x:Name="WordFileSelectButton" Content="Wordファイル選択" Click="WordFileSelectButton_Click" Width="120"/>
+
+            <TextBlock TextWrapping="Wrap" Text="②背面画像ファイル差し替え（png,jpg）" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+            <TextBox x:Name="tbFrontFilePath" TextWrapping="NoWrap" Text="" Width="240"/>
+            <Button x:Name="FrontSelectButton" Content="画像選択(png,jpg)" Click="FrontSelectButton_Click" Width="120"/>
+
+            <!--<TextBlock TextWrapping="Wrap" Text="③裏面画像ファイル差し替え（png,jpg）" HorizontalAlignment="Center"/>
+            <TextBox x:Name="tbBackFilePath" TextWrapping="NoWrap" Text="" Width="240"/>
+            <Button x:Name="BackSelectButton" Content="画像選択(png,jpg)" Click="BackSelectButton_Click" Width="120"/>-->
+
+            <!--<TextBlock TextWrapping="Wrap" Text="修正テンプレート内差し替え対象" />
+            <CheckBox x:Name="cbFrontSide" Content="表面画像（片面印刷場合はこちらのみ選択してください）" IsChecked="True"/>
+            <CheckBox x:Name="cbBackSide" Content="裏面画像"/>-->
+
+            <!--<TextBlock TextWrapping="Wrap" Text="Wordファイルの保護パスワード" HorizontalAlignment="Center"/>
+            <PasswordBox x:Name="pbWordFile" Width="120"/>-->
+
+            <Button x:Name="Replace_CommandButton" Content="テンプレート修正実行" Click="Replace_CommandButton_Click" Width="120" Margin="0,20,0,0"/>
+            
+
+        </StackPanel>
+    </Grid>
+</Window>
