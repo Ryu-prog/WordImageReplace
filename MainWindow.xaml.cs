@@ -36,15 +36,15 @@ namespace WordImageReplace
                 this.tbFrontFilePath.Text = Properties.Settings.Default.FrontFilePath;
             }
 
-            //if (!String.IsNullOrEmpty(Properties.Settings.Default.BackFilePath))
-            //{
-            //    this.tbBackFilePath.Text = Properties.Settings.Default.BackFilePath;
-            //}
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.BackFilePath))
+            {
+                this.tbBackFilePath.Text = Properties.Settings.Default.BackFilePath;
+            }
 
-            //if (!String.IsNullOrEmpty(Properties.Settings.Default.Password))
-            //{
-            //    this.pbWordFile.Password = Properties.Settings.Default.Password;
-            //}
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.Password))
+            {
+                this.pbWordFile.Password = Properties.Settings.Default.Password;
+            }
 
             Closing += FormMain_FormClosing;
         }
@@ -57,7 +57,7 @@ namespace WordImageReplace
             Properties.Settings.Default.TemplatePath = this.tbWordFilePath.Text;
             Properties.Settings.Default.FrontFilePath = this.tbFrontFilePath.Text;
             Properties.Settings.Default.BackFilePath = this.tbBackFilePath.Text;
-            //Properties.Settings.Default.Password = this.pbWordFile.Password;
+            Properties.Settings.Default.Password = this.pbWordFile.Password;
             Properties.Settings.Default.Save();
 
         }
@@ -71,7 +71,7 @@ namespace WordImageReplace
             string templatePath = this.tbWordFilePath.Text;
             string frontFilePath = this.tbFrontFilePath.Text;
             string backFilePath = this.tbBackFilePath.Text;
-            //string protectPass = this.pbWordFile.Password;
+            string wdPassword = this.pbWordFile.Password;
 
             //入力欄チェック
             if (File.Exists(templatePath) == false) {
@@ -93,28 +93,40 @@ namespace WordImageReplace
 
 
             WordController wd = new WordController();
-            //try
-            //{
-                wd.OpenDocument(templatePath);
+            try
+            {
+                wd.OpenDocument(templatePath,true, wdPassword);
 
-                //wd.UnprotectPassword(protectPass);
+                //画像の左端位置を設定
+                float left = 0;
+                //画像の上端位置を設定
+                float top = 0;
+                //画像の横幅を設定
+                float width = wd.wdPageSetup.PageWidth;
+                //画像の縦幅を設定
+                float height = wd.wdPageSetup.PageHeight;
 
-                if (isChangeFront)
+
+                //全セクションに対して画像を差し替え
+                //（セクションが分けられている場合を考慮しない）
+                foreach (Microsoft.Office.Interop.Word.Section sec in wd.wdSections)
                 {
-                    wd.HeaderPictureChange(WdHeaderFooterIndex.wdHeaderFooterPrimary, frontFilePath);
+                    if (isChangeFront)
+                    {
+                        wd.HeaderPictureChange(sec, frontFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterPrimary);
+                        wd.SetSharpRange(sec, WdHeaderFooterIndex.wdHeaderFooterPrimary);
+                    }
+
+                    if (isChangeBack)
+                    {
+                        wd.HeaderPictureChange(sec, backFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
+                        wd.SetSharpRange(sec, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
+                    }
                 }
-
-                //if (isChangeBack)
-                //{
-                //    wd.HeaderPictureChange(WdHeaderFooterIndex.wdHeaderFooterEvenPages, backFilePath);
-                //}
-
-                //wd.ProtectPassword(protectPass);
-
                 //保存先選択ダイアログを表示
                 OpenFileDialog opd = new OpenFileDialog();
 
-                opd.Filter = "Wordファイル(*.dotx)|*.dotx";
+                opd.Filter = "Wordファイル(*.docx)|*.docx";
 
                 opd.FileName = templatePath;
 
@@ -125,16 +137,16 @@ namespace WordImageReplace
 
 
                 //保存完了メッセージ
-                System.Windows.MessageBox.Show("Wordファイルの背景画像を差し替えました。"
+                System.Windows.MessageBox.Show("Wordファイルのヘッダー画像を差し替えました。"
                         , "正常終了", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            //}
-            //catch(Exception ex)
-            //{
-            //    System.Windows.MessageBox.Show("エラーが発生しました" + Environment.NewLine + ex.ToString(), "エラー");
-            //}
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("エラーが発生しました" + Environment.NewLine + ex.ToString(), "エラー");
+            }
 
-            
+
 
         }
 
@@ -169,16 +181,16 @@ namespace WordImageReplace
             }
         }
 
-        //private void BackSelectButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    OpenFileDialog opd = new OpenFileDialog();
+        private void BackSelectButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog opd = new OpenFileDialog();
 
-        //    opd.Filter = "画像ファイル|*.png;*.jp*g";
+            opd.Filter = "画像ファイル|*.png;*.jp*g";
 
-        //    if ((bool)opd.ShowDialog())
-        //    {
-        //        this.tbBackFilePath.Text = opd.FileName;
-        //    }
-        //}
+            if ((bool)opd.ShowDialog())
+            {
+                this.tbBackFilePath.Text = opd.FileName;
+            }
+        }
     }
 }
