@@ -19,7 +19,7 @@ namespace WordImageReplace
         private Microsoft.Office.Interop.Word.Documents wordDocuments = null;
         private Microsoft.Office.Interop.Word.Document wordDocument = null;
 
-        public Microsoft.Office.Interop.Word.Sections wdSections { get { return this.wordDocument.Sections; } }
+        public int wdSecCnt { get { return this.wordDocument.Sections.Count; } }
         public Microsoft.Office.Interop.Word.PageSetup wdPageSetup { get { return this.wordDocument.PageSetup; } }    
 
         public void OpenDocument(string filePath, bool isVisible = false, string passWord = "")
@@ -89,7 +89,7 @@ namespace WordImageReplace
         /// wdHeaderFooterPrimary:奇数ページの画像差し替え（奇数ページと偶数ページのヘッダーが分かれていない場合全ページ）
         /// wdHeaderFooterEvenPages:偶数ページの画像差し替え
         /// </param>
-        public void HeaderPictureChange(Section sec, string imagePath, double left, double top, double width, double height, WdHeaderFooterIndex headerIndex = WdHeaderFooterIndex.wdHeaderFooterPrimary)
+        public void HeaderPictureChange(int sectionNum, string imagePath, double left, double top, double width, double height, WdHeaderFooterIndex headerIndex = WdHeaderFooterIndex.wdHeaderFooterPrimary)
         {
             //奇数ページの場合、奇数ページと偶数ページのヘッダーを分けるをON
             if (headerIndex == WdHeaderFooterIndex.wdHeaderFooterEvenPages)
@@ -107,6 +107,8 @@ namespace WordImageReplace
 
             //全セクションに対して画像を差し替え
             //（セクションが分けられている場合を考慮しない）
+            Section sec = this.wordDocument.Sections[sectionNum];
+
             HeaderFooter header = sec.Headers[headerIndex];
 
             //既に存在する画像を削除
@@ -130,7 +132,7 @@ namespace WordImageReplace
         /// <param name="wdRHP">図形範囲の相対位置を指定（平行方向）</param>
         /// <param name="left">/図形範囲の相対位置（左）</param>
         public void SetSharpRange(
-            Section sec,
+            int sectionNum,
             WdHeaderFooterIndex headerIndex,
             Microsoft.Office.Core.MsoTriState state = Microsoft.Office.Core.MsoTriState.msoTrue,
             WdRelativeVerticalPosition wdRVP = WdRelativeVerticalPosition.wdRelativeVerticalPositionPage,
@@ -138,6 +140,8 @@ namespace WordImageReplace
             float left = 0
             )
         {
+            Section sec = this.wordDocument.Sections[sectionNum];
+
             ShapeRange shapeRange = sec.Headers[headerIndex].Range.ShapeRange;
 
             //図形のロックを設定

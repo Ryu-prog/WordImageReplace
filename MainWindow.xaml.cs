@@ -109,18 +109,17 @@ namespace WordImageReplace
 
                 //全セクションに対して画像を差し替え
                 //（セクションが分けられている場合を考慮しない）
-                foreach (Microsoft.Office.Interop.Word.Section sec in wd.wdSections)
-                {
+                for (int secNum=1; secNum <= wd.wdSecCnt; secNum++) {
                     if (isChangeFront)
                     {
-                        wd.HeaderPictureChange(sec, frontFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterPrimary);
-                        wd.SetSharpRange(sec, WdHeaderFooterIndex.wdHeaderFooterPrimary);
+                        wd.HeaderPictureChange(secNum, frontFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterPrimary);
+                        wd.SetSharpRange(secNum, WdHeaderFooterIndex.wdHeaderFooterPrimary);
                     }
 
                     if (isChangeBack)
                     {
-                        wd.HeaderPictureChange(sec, backFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
-                        wd.SetSharpRange(sec, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
+                        wd.HeaderPictureChange(secNum, backFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
+                        wd.SetSharpRange(secNum, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
                     }
                 }
                 //保存先選択ダイアログを表示
