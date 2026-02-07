@@ -24,9 +24,6 @@
             <CheckBox x:Name="cbFrontSide" Content="表面画像（片面印刷の場合はこちらのみ選択してください）" IsChecked="True"/>
             <CheckBox x:Name="cbBackSide" Content="裏面画像"/>
 
-            <TextBlock TextWrapping="Wrap" Text="Wordファイルの保護パスワード" HorizontalAlignment="Center"/>
-            <PasswordBox x:Name="pbWordFile" Width="120"/>
-
             <Button x:Name="Replace_CommandButton" Content="画像差し替え実行" Click="Replace_CommandButton_Click" Width="120" Margin="0,20,0,0"/>
             
 

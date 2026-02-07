@@ -10,12 +10,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Office.Interop.Word;
 using System.ComponentModel;
 using System.IO;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
-
 namespace WordImageReplace
 {
     /// <summary>
@@ -41,11 +39,6 @@ namespace WordImageReplace
                 this.tbBackFilePath.Text = Properties.Settings.Default.BackFilePath;
             }
 
-            if (!String.IsNullOrEmpty(Properties.Settings.Default.Password))
-            {
-                this.pbWordFile.Password = Properties.Settings.Default.Password;
-            }
-
             Closing += FormMain_FormClosing;
         }
 
@@ -57,7 +50,6 @@ namespace WordImageReplace
             Properties.Settings.Default.TemplatePath = this.tbWordFilePath.Text;
             Properties.Settings.Default.FrontFilePath = this.tbFrontFilePath.Text;
             Properties.Settings.Default.BackFilePath = this.tbBackFilePath.Text;
-            Properties.Settings.Default.Password = this.pbWordFile.Password;
             Properties.Settings.Default.Save();
 
         }
@@ -71,89 +63,52 @@ namespace WordImageReplace
             string templatePath = this.tbWordFilePath.Text;
             string frontFilePath = this.tbFrontFilePath.Text;
             string backFilePath = this.tbBackFilePath.Text;
-            string wdPassword = this.pbWordFile.Password;
 
-            //入力欄チェック
-            if (File.Exists(templatePath) == false) {
-                System.Windows.MessageBox.Show(templatePath + "が見つかりませんでした。\n対象のファイルが存在するか確認してください。"
-                    , "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+            // 入力欄チェック（既存のチェックはそのまま）
+            if (!File.Exists(templatePath)) {
+                System.Windows.MessageBox.Show(templatePath + "が見つかりませんでした。\n対象のファイルが存在するか確認してください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (!File.Exists(frontFilePath)) {
+                System.Windows.MessageBox.Show(frontFilePath + "が見つかりませんでした。\n対象のファイルが存在するか確認してください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (isChangeBack && !File.Exists(backFilePath)) {
+                System.Windows.MessageBox.Show(backFilePath + "が見つかりませんでした。\n対象のファイルが存在するか確認してください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
-            if (File.Exists(frontFilePath) == false) {
-                System.Windows.MessageBox.Show(frontFilePath + "が見つかりませんでした。\n対象のファイルが存在するか確認してください。"
-                    , "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-            if (isChangeBack && File.Exists(backFilePath) == false)
-            {
-                System.Windows.MessageBox.Show(backFilePath + "が見つかりませんでした。\n対象のファイルが存在するか確認してください。"
-                    , "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-
-
-            WordController wd = new WordController();
             try
             {
-                wd.OpenDocument(templatePath,true, wdPassword);
+                // 保存先選択ダイアログ
+                var sfd = new Microsoft.Win32.SaveFileDialog();
+                sfd.Filter = "Wordファイル(*.docx)|*.docx";
+                sfd.FileName = System.IO.Path.GetFileName(templatePath);
 
-                //画像の左端位置を設定
-                float left = 0;
-                //画像の上端位置を設定
-                float top = 0;
-                //画像の横幅を設定
-                float width = wd.wdPageSetup.PageWidth;
-                //画像の縦幅を設定
-                float height = wd.wdPageSetup.PageHeight;
-
-
-                //全セクションに対して画像を差し替え
-                //（セクションが分けられている場合を考慮しない）
-                for (int secNum=1; secNum <= wd.wdSecCnt; secNum++) {
-                    if (isChangeFront)
-                    {
-                        wd.HeaderPictureChange(secNum, frontFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterPrimary);
-                        wd.SetSharpRange(secNum, WdHeaderFooterIndex.wdHeaderFooterPrimary);
-                    }
-
-                    if (isChangeBack)
-                    {
-                        wd.HeaderPictureChange(secNum, backFilePath, left, top, width, height, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
-                        wd.SetSharpRange(secNum, WdHeaderFooterIndex.wdHeaderFooterEvenPages);
-                    }
-                }
-                //保存先選択ダイアログを表示
-                OpenFileDialog opd = new OpenFileDialog();
-
-                opd.Filter = "Wordファイル(*.docx)|*.docx";
-
-                opd.FileName = templatePath;
-
-                if ((bool)opd.ShowDialog())
+                if (sfd.ShowDialog() == true)
                 {
-                    wd.SaveDoc(opd.FileName);
+                    string savePath = sfd.FileName;
+                    if (System.IO.Path.GetFullPath(savePath).Equals(System.IO.Path.GetFullPath(templatePath), StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show("保存先に元ファイルを選択できません。別名を選択してください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    try
+                    {
+                        OpenXmlWordHeaderReplacer.ReplaceHeaderImages(templatePath, savePath, frontFilePath, backFilePath, isChangeFront, isChangeBack);
+                        MessageBox.Show("Wordファイルのヘッダー画像を差し替えました。", "正常終了", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (IOException ioEx)
+                    {
+                        MessageBox.Show("ファイルにアクセスできません。他のアプリで開かれている可能性があります。\n" + ioEx.Message, "ファイル使用中", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
-
-
-                //保存完了メッセージ
-                System.Windows.MessageBox.Show("Wordファイルのヘッダー画像を差し替えました。"
-                        , "正常終了", MessageBoxButton.OK, MessageBoxImage.Information);
-
             }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("エラーが発生しました" + Environment.NewLine + ex.ToString(), "エラー");
             }
-
-
-
-        }
-
-        private string FilePathSelect(string FilePath, string ExtensionLabel, string Extension)
-        {
-
-
-            return null;
         }
 
         private void WordFileSelectButton_Click(object sender, RoutedEventArgs e)
