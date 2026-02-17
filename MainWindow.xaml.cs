@@ -132,6 +132,12 @@ namespace WordImageReplace
             if ((bool)opd.ShowDialog())
             {
                 this.tbFrontFilePath.Text = opd.FileName;
+
+                // 選択されたファイルのパスからURIを作成
+                Uri fileUri = new Uri(opd.FileName);
+
+                // BitmapImageを作成してImageコントロールにセット
+                FrontImage.Source = new BitmapImage(fileUri);
             }
         }
 
@@ -144,6 +150,12 @@ namespace WordImageReplace
             if ((bool)opd.ShowDialog())
             {
                 this.tbBackFilePath.Text = opd.FileName;
+
+                // 選択されたファイルのパスからURIを作成
+                Uri fileUri = new Uri(opd.FileName);
+
+                // BitmapImageを作成してImageコントロールにセット
+                BackImage.Source = new BitmapImage(fileUri);
             }
         }
     }

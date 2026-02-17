@@ -5,9 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WordImageReplace"
         mc:Ignorable="d"
-        Title="MainWindow" Height="380" Width="400">
+        Title="MainWindow" Height="380" Width="880">
     <Grid>
-        <StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0">
             <TextBlock TextWrapping="Wrap" Text="①	修正対象Wordファイル（dotx）" HorizontalAlignment="Center" Margin="0,20,0,0"/>
             <TextBox x:Name="tbWordFilePath" TextWrapping="NoWrap" Text="" Width="240"/>
             <Button x:Name="WordFileSelectButton" Content="Wordファイル選択" Click="WordFileSelectButton_Click" Width="120"/>
@@ -25,8 +30,14 @@
             <CheckBox x:Name="cbBackSide" Content="裏面画像"/>
 
             <Button x:Name="Replace_CommandButton" Content="画像差し替え実行" Click="Replace_CommandButton_Click" Width="120" Margin="0,20,0,0"/>
-            
-
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <TextBlock TextWrapping="Wrap" Text="表面画像" HorizontalAlignment="Center"/>
+            <Image x:Name="FrontImage" Width="240" Height="300" Margin="0,10,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+            <TextBlock TextWrapping="Wrap" Text="裏面画像" HorizontalAlignment="Center"/>
+            <Image x:Name="BackImage" Width="240" Height="300" Margin="0,10,0,0"/>
         </StackPanel>
     </Grid>
 </Window>
