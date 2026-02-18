@@ -35,6 +35,9 @@ Windows 10 / 11
 
 - EMU（English Metric Units）計算により、画像の解像度に応じたサイズ調整を行っています。
 
+## ダウンロード
+最新版の実行ファイル（Windows用）は [こちらのリリースページ](https://github.com/Ryu-prog/WordImageReplace/releases/latest) からダウンロードできます。
+
 ライセンス
 MIT License
 
